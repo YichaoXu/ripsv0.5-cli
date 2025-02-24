@@ -269,7 +269,7 @@ class Scanner
 						}
 						
 						$mainparent->lines[] = $var_declare->line;	
-						$var_trace = new VarDeclare('');
+						$var_trace = new VarDeclare(comment: '');
 						$parent->children[] = $var_trace;
 					} else
 					{	

@@ -726,5 +726,123 @@ You should have received a copy of the GNU General Public License along with thi
 		echo '<tr><td nowrap onmouseover="this.style.color=\'white\';" onmouseout="this.style.color=\'#DFDFDF\';" onClick="catshow(\'',$name,'\')" style="cursor:pointer;" title="show only vulnerabilities of this category">',$name,':</td><td nowrap><div id="chart'.$nr.'" class="chart" style="width:',
 			round(($amount/$all)*100,0),'"></div><div id="vuln'.$nr.'">',$amount,'</div></td></tr>';
 	}
+
+	/**
+	 * CLI Version of `printoutput()`
+	 * Outputs scan results in a terminal-friendly format.
+	 */
+	function printoutput_cli($output, $treestyle = 1)
+	{
+		if (!empty($output)) {
+			$nr = 0;
+			reset($output);
+			do {
+				$filename = key($output);
+				if ($filename != "" && !empty($output[$filename]) && fileHasVulns($output[$filename])) {
+					echo "📂 File: $filename"  . "\n";
+
+					foreach ($output[$filename] as $vulnBlock) {
+						if ($vulnBlock->vuln) {
+							$nr++;
+							echo "🚨 [Vulnerability] " . "{$vulnBlock->category}" . "\n";
+
+							// 处理 `treestyle`
+							if ($treestyle == 2) {
+								krsort($vulnBlock->treenodes);
+							}
+
+							foreach ($vulnBlock->treenodes as $tree) {
+								echo  "  ├─ 📌 Function: ". "{$tree->name}" . "\n";
+								echo  "  │  ├─ 📄 File: " . "{$tree->filename}" . "\n";
+								echo  "  │  ├─ 📝 Code Lines: " . implode(',', $tree->lines) . "\n";
+
+								// 是否包含用户输入源
+								if (!empty($tree->get) || !empty($tree->post) || !empty($tree->cookie) || !empty($tree->files) || !empty($tree->server)) {
+									echo  "  │  ├─ ⚠️ User Input Sources: " ;
+									echo (!empty($tree->get) ? "GET " : "") . (!empty($tree->post) ? "POST " : "");
+									echo (!empty($tree->cookie) ? "COOKIE " : "") . (!empty($tree->files) ? "FILES " : "");
+									echo (!empty($tree->server) ? "SERVER " : "") . "\n";
+								}
+
+								// 处理漏洞传播路径
+								echo  "  │  ├─ 🔗 Propagation Path:" . "\n";
+								if ($treestyle == 1) {
+									traverseBottomUp($tree);
+								} else if ($treestyle == 2) {
+									traverseTopDown($tree);
+								}
+								dependenciesTraverse($tree);
+							}
+
+							// 显示可能的替代路径
+							if (!empty($vulnBlock->alternatives)) {
+								echo  "  ├─ 🔄 Alternative Paths:" . "\n";
+								foreach ($vulnBlock->alternatives as $alternative) {
+									echo  "  │  ├─ $alternative" . "\n";
+								}
+							}
+
+							echo "\n";
+						}
+					}
+					echo "--------------------------------------\n";
+				} else if (count($output) == 1) {
+					echo  "⚠️  No vulnerabilities found. Try changing verbosity level or attack type.\n" ;
+				}
+			} while (next($output));
+		} else if (count($GLOBALS['scanned_files']) > 0) {
+			echo  "⚠️  No vulnerabilities found. Try adjusting the verbosity level or attack type.\n" ;
+		} else {
+			echo  "❌  No files scanned. Please check your path or filename.\n" ;
+		}
+	}
+
+	/**
+	 * CLI JSON Output of RIPS Scan Results
+	 * Converts scan results into structured JSON format.
+	 */
+	function printoutput_json($output, $treestyle = 1)
+	{
+		$result = [];
 	
-?>	
+		if (!empty($output)) {
+			reset($output);
+			do {
+				$filename = key($output);
+				if ($filename != "" && !empty($output[$filename]) && fileHasVulns($output[$filename])) {
+					foreach ($output[$filename] as $vulnBlock) {
+						if ($vulnBlock->vuln) {
+							$vulnType = $vulnBlock->category;
+							$instances = [];
+	
+							if ($treestyle == 2) {
+								krsort($vulnBlock->treenodes);
+							}
+	
+							foreach ($vulnBlock->treenodes as $tree) {
+								$instances[] = [
+									"file" => $tree->filename,
+									"lines" => $tree->lines
+								];
+							}
+	
+							// 仅当 `instances` 非空时处理
+							if (!empty($instances)) {
+								$firstInstance = $instances[0];  // 第一项 -> `sink`
+								$lastInstance = $instances[count($instances) - 1]; // 最后一项 -> `source`
+	
+								$result[] = [
+									"type" => $vulnType,
+									"source" => "{$lastInstance['file']}:".end($lastInstance["lines"]),
+									"sink" => "{$firstInstance['file']}:".reset($firstInstance["lines"])
+								];
+							}
+						}
+					}
+				}
+			} while (next($output));
+		}
+	
+		echo "\n" .json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+	}
+	
