@@ -1,0 +1,8 @@
+{
+    "name": "yichao/ripsv0.5-cli",
+    "description": "a cli version of the robocoder/rips-scanner",
+    "type": "project",
+    "bin": ["rips.php"],
+    "authors": [],
+    "require": {}
+}

@@ -84,25 +84,20 @@ $output_format = $options["format"] ?? "readable";
 
 ###############################  INCLUDES  ################################
 // 检查是否在 PHAR 运行环境
-if (Phar::running()) {
-    define('BASE_PATH', dirname(Phar::running(false)));
-} else {
-    define('BASE_PATH', __DIR__);
-}
-include BASE_PATH . "/config/general.php"; // general settings
-include BASE_PATH . "/config/sources.php"; // tainted variables and functions
-include BASE_PATH . "/config/tokens.php"; // tokens for lexical analysis
-include BASE_PATH . "/config/securing.php"; // securing functions
-include BASE_PATH . "/config/sinks.php"; // sensitive sinks
-include BASE_PATH . "/config/info.php"; // interesting functions
+include "config/general.php"; // general settings
+include "config/sources.php"; // tainted variables and functions
+include "config/tokens.php"; // tokens for lexical analysis
+include "config/securing.php"; // securing functions
+include "config/sinks.php"; // sensitive sinks
+include "config/info.php"; // interesting functions
 
-include BASE_PATH . "/lib/constructer.php"; // classes
-include BASE_PATH . "/lib/filer.php"; // read files from dirs and subdirs
-include BASE_PATH . "/lib/tokenizer.php"; // prepare and fix token list
-include BASE_PATH . "/lib/analyzer.php"; // string analyzers
-include BASE_PATH . "/lib/scanner.php"; // provides class for scan
-include BASE_PATH . "/lib/printer.php"; // output scan result
-include BASE_PATH . "/lib/searcher.php"; // search functions
+include "lib/constructer.php"; // classes
+include "lib/filer.php"; // read files from dirs and subdirs
+include "lib/tokenizer.php"; // prepare and fix token list
+include "lib/analyzer.php"; // string analyzers
+include "lib/scanner.php"; // provides class for scan
+include "lib/printer.php"; // output scan result
+include "lib/searcher.php"; // search functions
 
 ###############################  MAIN  ####################################
 
