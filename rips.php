@@ -2,7 +2,7 @@
 // parse CLI options
 $args = $argv;
 array_shift($args);
-$allowedOptions = ["vector", "verbosity", "format", "ignore_warning", "help"];
+$allowedOptions = ["vector", "verbosity", "format", "help"];
 $options = [];
 $path = null;
 
@@ -97,16 +97,7 @@ if (!empty($_POST["loc"]))
     $location = realpath($_POST["loc"]);
 
     if (is_dir($location)) {
-        $scan_subdirs = isset($_POST["subdirs"]) ? $_POST["subdirs"] : false;
-        $files = read_recursiv($location, $scan_subdirs);
-
-        if (count($files) > WARNFILES && !isset($_POST["ignore_warning"])) {
-            die(
-                "warning: the number of files " .
-                    count($files) .
-                    " over limits. Please use --ignore_warning."
-            );
-        }
+        $files = read_recursiv($location, true);
     } 
     elseif (
         is_file($location) &&
