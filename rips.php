@@ -14,20 +14,18 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, see <http://www.gnu.org/licenses/>.		
 
 **/
-// 解析 CLI 选项
+// parse CLI options
 $args = $argv;
 array_shift($args);
-
-// 预定义选项（所有的支持参数）
 $allowedOptions = ["vector", "verbosity", "format", "ignore_warning", "help"];
 $options = [];
 $path = null;
 
-// 解析参数
+// parse CLI arguments
 while (!empty($args)) {
     $arg = array_shift($args);
 
-    // 解析 `--option=value`
+    // parse --option=value
     if (strpos($arg, "--") === 0 && strpos($arg, "=") !== false) {
         list($key, $value) = explode("=", substr($arg, 2), 2);
         if (in_array($key, $allowedOptions)) {
@@ -36,21 +34,20 @@ while (!empty($args)) {
             die("Error: Unknown option --{$key}\n");
         }
     }
-    // 解析 `--option value`
+    // parse `--option value`
     elseif (strpos($arg, "--") === 0) {
         $key = substr($arg, 2);
         if (in_array($key, $allowedOptions)) {
-            // 检查下一个参数是否是值
             if (!empty($args) && strpos($args[0], "--") !== 0) {
                 $options[$key] = array_shift($args);
             } else {
-                $options[$key] = true; // 选项无值，则默认为 `true`
+                $options[$key] = true; // default true
             }
         } else {
             die("Error: Unknown option --{$key}\n");
         }
     }
-    // 解析 `path`（第一个非选项参数）
+    // parse value of the path
     elseif (!$path) {
         $path = $arg;
     } else {
@@ -58,7 +55,7 @@ while (!empty($args)) {
     }
 }
 
-// 处理 `--help`
+// parse --help
 if (isset($options["help"]) || $path == null) {
     echo "Usage: php cli_parser.php /path/to/php/code [--vector=<type>]\n";
     echo "Options:\n";
@@ -69,21 +66,20 @@ if (isset($options["help"]) || $path == null) {
     exit(0);
 }
 
-// 解析 `path`
+// parse `path`
 $_POST["loc"] = $path;
 
-// 解析 `vector`
+// parse `vector`
 $_POST["vector"] = $options["vector"] ?? "all";
 
-// 解析 `verbosity`
+// parse `verbosity`
 $_POST["verbosity"] = $options["verbosity"] ?? 1;
 
-// 解析 `format`
+// parse `format`
 $output_format = $options["format"] ?? "readable";
 
 
 ###############################  INCLUDES  ################################
-// 检查是否在 PHAR 运行环境
 include "config/general.php"; // general settings
 include "config/sources.php"; // tainted variables and functions
 include "config/tokens.php"; // tokens for lexical analysis
@@ -101,7 +97,7 @@ include "lib/searcher.php"; // search functions
 
 ###############################  MAIN  ####################################
 
-$start = microtime(as_float: true);
+$start = microtime(true);
 
 $output = [];
 $info = [];
@@ -118,7 +114,7 @@ if (!empty($_POST["loc"]))
         if (count($files) > WARNFILES && !isset($_POST["ignore_warning"])) {
             die(
                 "warning: the number of files " .
-                    count(value: $files) .
+                    count($files) .
                     " over limits. Please use --ignore_warning."
             );
         }
