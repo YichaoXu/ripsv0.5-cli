@@ -24,7 +24,7 @@ SEE RIPSv0.5 Copyright file in their [Github](https://github.com/ripsscanner/rip
 We provide a **standalone release version** that does not require additional dependencies. You can download it from the **Releases** section.
 
 ```sh
-wget https://github.com/yourname/RIPSv0.5-cli/releases/latest/download/rips.phar
+wget https://github.com/YichaoXu/ripsv0.5-cli/releases/download/v0.5-2025.02.24/ripsv0.5-cli.phar
 chmod +x rips.phar
 ```
 
