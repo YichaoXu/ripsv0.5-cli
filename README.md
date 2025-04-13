@@ -30,7 +30,7 @@ chmod +x rips.phar
 
 Now you can run it directly:
 ```sh
-php ./rips.php /path/to/php/code --vector=xss --format=json
+php ./rips.phar /path/to/php/code --vector=xss --format=json
 ```
 
 ### **Option 2: Clone the Repository**
