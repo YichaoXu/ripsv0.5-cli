@@ -4,7 +4,7 @@ A **command-line interface (CLI) version** of [RIPS v0.5](https://github.com/rip
 
 This project **removes the web server requirement** and transforms the original **RIPS v0.5** into a **standalone CLI tool**, making it easier to integrate into automated security workflows.
 
-> **🚨 Note:** RIPS v0.5 development is **abandoned** due to its fundamental limitations. A completely new version is available at **[ripstech.com](https://github.com/ripsscanner/rips).**
+> ** Note:** RIPS v0.5 development is **abandoned** by the original developers. See their new version available at **[ripstech.com](https://github.com/ripsscanner/rips).**
 
 ---
 
